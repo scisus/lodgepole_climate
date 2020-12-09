@@ -55,7 +55,7 @@ pick_temp_by_location <- function(nc_locations, nc_connection) { # locations is 
 }
 
 # read in site locations #############
-site_locs <- read.csv("data/seed_orchard_site_coordinates.csv", stringsAsFactors = FALSE, header=TRUE)
+site_locs <- read.csv("seed_orchard_site_coordinates.csv", stringsAsFactors = FALSE, header=TRUE)
 
 # extract weather data from PCIC netcdf file #################
 
@@ -121,7 +121,7 @@ toomanytest <- alltemps %>%
     filter(tempsperdate > 1)
 nrow(toomanytest)==0 #TRUE
 
-write.csv(alltemps, 'data/weather_data/pcic/seed_orchard_sites_full_timeseries.csv', row.names = FALSE)
+write.csv(alltemps, 'weather_data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
 
 # locations of both sites and the closest gridded weather point with corrected elevation ###########
 all_locations <- locations %>%
