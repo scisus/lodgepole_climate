@@ -1,5 +1,10 @@
 # extract site weather data from PCIC netcdf files. netcdf files are for relatively large blocks that include the points of interest. Also record and store grid point locations and elevations for site and gridpoints.
 
+# - extracts data from netcdf files with [maximum](data/pcic/PNWNAmet_tasmax.nc.nc) and [minimum](data/pcic/PNWNAmet_tasmin.nc.nc) temperatures for [seed orchard sites](seed_orchard_site_coordinates.csv)
+# - calculates the mean daily temperature for each day of 1945-2012
+# - writes the mean daily temperature for each day out to a [file](output/seed_orchard_sites_pcic_ts.csv)
+# - combines site locations with gridpoint locations and their elevations and [writes it out](seed_orchard_sites_pcic.csv)
+
 library(ncdf4)
 library(dplyr)
 library(tidyr)
@@ -54,8 +59,7 @@ pick_temp_by_location <- function(nc_locations, nc_connection) { # locations is 
     return(temp_tidy)
 }
 
-# read in site locations #############
-site_locs <- read.csv("seed_orchard_site_coordinates.csv", stringsAsFactors = FALSE, header=TRUE)
+
 
 # extract weather data from PCIC netcdf file #################
 
@@ -64,6 +68,9 @@ site_locs <- read.csv("seed_orchard_site_coordinates.csv", stringsAsFactors = FA
 timestart <- as.Date("1945-01-01")
 firstday <- as.integer(as.Date("1945-01-01") - timestart + 1) # check this
 lastday <- as.integer(as.Date("2012-12-31") - timestart + 1)
+
+# read in site locations #############
+site_locs <- read.csv("../locations/seed_orchard_site_coordinates.csv", stringsAsFactors = FALSE, header=TRUE)
 
 # the netcdf files each contain either maximum or minimum temperatures.
 
@@ -121,7 +128,7 @@ toomanytest <- alltemps %>%
     filter(tempsperdate > 1)
 nrow(toomanytest)==0 #TRUE
 
-write.csv(alltemps, 'weather_data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
+write.csv(alltemps, '..data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
 
 # locations of both sites and the closest gridded weather point with corrected elevation ###########
 all_locations <- locations %>%
@@ -142,5 +149,5 @@ colnames(gridelevs) <- c("Gridlat", "Gridlon", "Gridelev")
 all_locations <- full_join(gridelevs, all_locations)
 
 # write
-write.csv(all_locations, 'data/seed_orchard_sites_pcic.csv', row.names = FALSE)
+write.csv(all_locations, '../locations/seed_orchard_sites_pcic.csv', row.names = FALSE)
 

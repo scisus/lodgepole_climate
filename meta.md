@@ -1,12 +1,11 @@
 #meta for lodgepole_climate 
 
-`seed_orchard_site_coordinates.csv` location of seed orchard sites, formatted for ClimateNA
+This folder contains temperature data for [seed orchard sites](/locations) in BC. Large raw data sets, like the data from the [Pacific Climate Impacts Consortium](https://www.pacificclimate.org/) are stored in `data`.
 
-`seed_orchard_sites_pcic.csv` location of seed orchard sites, the closest PCIC gridpoint, and a corrected elevation.
+Data extracted from the large datasets in `data` or programs like [ClimateNA](http://climatena.ca/) are stored in `output`.
 
-`netcdf_extract.R` 
-- extracts data from netcdf files with [maximum](data/pcic/PNWNAmet_tasmax.nc.nc) and [minimum](data/pcic/PNWNAmet_tasmin.nc.nc) temperatures for [seed orchard sites](seed_orchard_site_coordinates.csv) 
-- calculates the mean daily temperature for each day of 1945-2012
-- writes the mean daily temperature for each day out to a [file](output/seed_orchard_sites_pcic_ts.csv)
-- combines site locations with gridpoint locations and their elevations and [writes it out](seed_orchard_sites_pcic.csv)
+Data processed for use in specific analyses are in `processed.`
+
+Scripts used to extract or process data are in `scripts`
+
 
