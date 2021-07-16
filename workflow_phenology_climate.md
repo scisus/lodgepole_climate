@@ -1,4 +1,4 @@
-# workflow
+# workflow to prepare site-specific daily temperature data from PCIC
 
 run `lodgepole_climate/scripts/netcdf_extract.R` to create `lodgepole_climate/output/seed_orchard_sites_pcic_ts.csv`
 - `netcdf_extract.R` pulls temps from the PCIC data for the gridpoints closest to the seed orchard sites.
