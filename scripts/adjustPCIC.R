@@ -44,7 +44,7 @@ ggplot(filter(cna, Month < 7), aes(x=meantempgrid, y=meantempsite)) +
     geom_point() +
     facet_wrap("Site") +
     geom_abline(slope=1, intercept=0) +
-    ggtitle("ClimateNA mean monthly temps 1950-2013 gridpoints vs sitepoints")
+    ggtitle("ClimateNA mean monthly temps 1950-2013 gridpoints vs sitepoints", subtitle = "ClimateNA monthly estimates are quite similar for grid points and sitepoints")
 
 # now compare ClimateNA to PCIC data
 
