@@ -35,3 +35,41 @@ ggplot(gcms, aes(x = Year, y = mean_temp, group = interaction(Month, ssp), colou
     scale_colour_brewer(type = "seq") +
     theme_dark() +
     labs(title = "Change in mean monthly temperature", caption="data from 13 model ensemble curated by Mahony et al. 2021")
+
+hist <- read.csv("processed/PCIC_all_seed_orchard_sites_adjusted.csv") %>%
+    mutate(Year = lubridate::year(Date), Month = lubridate::month(Date))  %>% # add year and month col
+    select(Date, Year, Month, Site, mean_temp_corrected) %>% # drop unneeded cols
+    rename(mean_temp = mean_temp_corrected)
+
+# choose a year (1984)
+
+baseyr <- 1984
+
+base <- filter(hist, Year == baseyr, Site == "Sorrento") #366 days
+
+# simplify gcm for dev
+
+badfuture <- filter(gcms, ssp == "ssp585", Site == "Sorrento") # 90 years
+
+# get monthly means for base year
+
+mmt <- base %>% group_by(Site, Year, Month) %>% summarise(mmt = mean(mean_temp)) %>% filter(Month < 7) %>% ungroup() %>% select(Year)
+
+# get differences between monthly temp of base year and monthly temp of a future year
+
+monthly_diffs <- full_join(badfuture, mmt) %>% 
+    mutate(mdiff = mean_temp - mmt) %>%
+    rename(mmt_gcm = mean_temp, Year_gcm = Year)
+
+# add monthly diffs to daily temps
+foo <- base %>%
+    full_join(monthly_diffs) %>%
+    mutate(mean_temp_gcm = mean_temp + mmt_gcm, DoY = lubridate::yday(Date)) %>%
+    filter(Month < 7)
+
+ggplot(foo, aes(x = DoY, y = mean_temp)) +
+    geom_line() +
+    geom_line(data=foo, aes(x = DoY, y = mean_temp_gcm, colour = Year_gcm, group = Year_gcm))
+    
+    
+
