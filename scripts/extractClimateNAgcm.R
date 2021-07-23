@@ -10,29 +10,37 @@ library(ggplot2)
 # functions ####
 # extract monthly average temperature data from climateNA data with id1, id2, Elevation, and Year columns and 12 Tave[1:12] columns
 extract_mean_temp <- function(data) {
-    
-    avgtemp <- data %>% dplyr::select(id1, id2, Elevation, Year, starts_with("Tave")) %>%
+
+    avgtemp <- data %>%
+        dplyr::arrange(Year) %>%
+        dplyr::filter(id1 == "site") %>% # don't need gridpoints
+        dplyr::select(id2, Elevation, Year, starts_with("Tave")) %>%
         tidyr::gather(key="Month", value="mean_temp", starts_with("Tave")) %>%
         dplyr::mutate(Month = as.numeric(stringr::str_extract(Month, "\\d."))) %>%
-        dplyr::rename(Site = id2)
-    
+        dplyr::rename(Site = id2) %>%
+        dplyr::mutate(SSP = str_sub(Year, start = 17, end = 20), climate_forcing = paste0(str_sub(Year, 21, 21), ".", str_sub(Year, 22, 22)), normal_period = str_sub(Year, start = -13, end = -5))
+
     return(avgtemp)
 }
 
 # data ####
-gcm_files <- list.files("output/climateNA/GCMs", pattern = "csv$")
-names(gcm_files) <- stringr::str_extract(gcm_files, "ssp[\\d]{3}")
+# gcm_files <- list.files("output/climateNA/GCMs", pattern = "csv$")
+# names(gcm_files) <- stringr::str_extract(gcm_files, "ssp[\\d]{3}")
+#
+# gcms <- purrr::map(gcm_files, function(x) read.csv(paste0("output/climateNA/GCMs/", x))) %>%
+#     purrr::map(extract_mean_temp) %>%
+#     bind_rows(.id = "ssp") %>%
+#     filter(Month < 7, id1 == "site") %>% # January thru June and site only
+#     select(-id1)
 
-gcms <- purrr::map(gcm_files, function(x) read.csv(paste0("output/climateNA/GCMs/", x))) %>%
-    purrr::map(extract_mean_temp) %>%
-    bind_rows(.id = "ssp") %>%
-    filter(Month < 7, id1 == "site") %>% # January thru June and site only
-    select(-id1)
+gcms <- read.csv("output/climateNA/GCMs/sitegrid_12 GCMsMP.csv") %>% # future climate normals
+    extract_mean_temp()
 
-ggplot(gcms, aes(x = Year, y = mean_temp, group = interaction(Month, ssp), colour = as.factor(Month))) +
+
+ggplot(filter(gcms, Month < 7), aes(x = normal_period, y = mean_temp, group = interaction(Month, SSP), colour = as.factor(Month))) +
     geom_line() +
-    facet_grid(Site ~ ssp) +
-    scale_colour_brewer(type = "seq") +
+    facet_grid(Site ~ SSP) +
+    scale_colour_brewer(type="seq") +
     theme_dark() +
     labs(title = "Change in mean monthly temperature", caption="data from 13 model ensemble curated by Mahony et al. 2021")
 
@@ -57,7 +65,7 @@ mmt <- base %>% group_by(Site, Year, Month) %>% summarise(mmt = mean(mean_temp))
 
 # get differences between monthly temp of base year and monthly temp of a future year
 
-monthly_diffs <- full_join(badfuture, mmt) %>% 
+monthly_diffs <- full_join(badfuture, mmt) %>%
     mutate(mdiff = mean_temp - mmt) %>%
     rename(mmt_gcm = mean_temp, Year_gcm = Year)
 
@@ -70,6 +78,6 @@ foo <- base %>%
 ggplot(foo, aes(x = DoY, y = mean_temp)) +
     geom_line() +
     geom_line(data=foo, aes(x = DoY, y = mean_temp_gcm, colour = Year_gcm, group = Year_gcm))
-    
-    
+
+
 
