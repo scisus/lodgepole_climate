@@ -57,11 +57,11 @@ base <- filter(hist, Year == baseyr, Site == "Sorrento") #366 days
 
 # simplify gcm for dev
 
-badfuture <- filter(gcms, ssp == "ssp585", Site == "Sorrento") # 90 years
+badfuture <- filter(gcms, SSP == "ssp585", Site == "Sorrento") # 90 years
 
 # get monthly means for base year
 
-mmt <- base %>% group_by(Site, Year, Month) %>% summarise(mmt = mean(mean_temp)) %>% filter(Month < 7) %>% ungroup() %>% select(Year)
+mmt <- base %>% group_by(Site, Year, Month) %>% summarise(mmt = mean(mean_temp)) %>% filter(Month < 7) %>% ungroup() %>% select(-Year)
 
 # get differences between monthly temp of base year and monthly temp of a future year
 
