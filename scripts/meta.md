@@ -12,3 +12,7 @@
 climateNA monthly site temp = a + b * pcic monthly grid temp
 
 corrected pcic daily = a + b * pcic daily temp
+
+`extractClimateNAgcm.R`
+- currently incomplete
+- extract monthly climate data from climateNA GCMs dataset
