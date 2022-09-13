@@ -61,55 +61,68 @@ pick_temp_by_location <- function(nc_locations, nc_connection) { # locations is 
 
 
 
-# extract weather data from PCIC netcdf file #################
+# extract weather data from PCIC netcdf file
+
+extract_pcic <- function(site_csv, maxtemp_nc, mintemp_nc) {
+
+    # dates in these files are days since Jan 1, 1945. Get date locations of dates of interest by replacing dates in first and lastday with your dates of interest
+    timestart <- as.Date("1945-01-01")
+    firstday <- as.integer(as.Date("1945-01-01") - timestart + 1) # check this
+    lastday <- as.integer(as.Date("2012-12-31") - timestart + 1)
+
+    # read in site locations #############
+    site_locs <- read.csv(site_csv, stringsAsFactors = FALSE, header=TRUE)
+
+    # the netcdf files each contain either maximum or minimum temperatures.
+
+    max_temp_nc <- nc_open(maxtemp_nc)
+    min_temp_nc <- nc_open(mintemp_nc)
+
+    # We can also ask the 'nc' object for metadata _about_ the variable we loaded, such as
+    # getting its name, units, dimensions, etc. Accessing nc$var this way is accessing metadata,
+    # not the variable itself. That was loaded with ncvar_get.
+
+    # get metadata for each variable to use as indexes for extracting the right temperatures
 
 
-# dates in these files are days since Jan 1, 1945. Get date locations of dates of interest by replacing dates in first and lastday with your dates of interest
-timestart <- as.Date("1945-01-01")
-firstday <- as.integer(as.Date("1945-01-01") - timestart + 1) # check this
-lastday <- as.integer(as.Date("2012-12-31") - timestart + 1)
-
-# read in site locations #############
-site_locs <- read.csv("../locations/seed_orchard_site_coordinates.csv", stringsAsFactors = FALSE, header=TRUE)
-
-# the netcdf files each contain either maximum or minimum temperatures.
-
-max_temp_nc <- nc_open("data/weather_data/pcic/PNWNAmet_tasmax.nc.nc")
-min_temp_nc <- nc_open("data/weather_data/pcic/PNWNAmet_tasmin.nc.nc")
-
-# We can also ask the 'nc' object for metadata _about_ the variable we loaded, such as
-# getting its name, units, dimensions, etc. Accessing nc$var this way is accessing metadata,
-# not the variable itself. That was loaded with ncvar_get.
-
-# get metadata for each variable to use as indexes for extracting the right temperatures
+    max_temp_meta <- index_get(max_temp_nc)
+    min_temp_meta <- index_get(min_temp_nc)
 
 
-max_temp_meta <- index_get(max_temp_nc)
-min_temp_meta <- index_get(min_temp_nc)
+    locations <- get_closest_ref(site_locs, max_temp_meta) # what is the closest PCIC gridpoint to each site? Should be identical for max and min temp
 
+    # extract only needed temperature data from the netcdf files
 
-locations <- get_closest_ref(site_locs, max_temp_meta) # what is the closest PCIC gridpoint to each site? Should be identical for max and min temp
+    # This is slow
+    max_temp <- pick_temp_by_location(locations, max_temp_nc)
+    min_temp <- pick_temp_by_location(locations, min_temp_nc)
 
-# extract only needed temperature data from the netcdf files
+    # ncvar_get can't read entire file at once
 
-# This is slow
-max_temp <- pick_temp_by_location(locations, max_temp_nc)
-min_temp <- pick_temp_by_location(locations, min_temp_nc)
+    # Combine all temp and sites ##################
 
-# ncvar_get can't read entire file at once
+    max_temps <- dplyr::rename(max_temp, max_temp=temp_in_c)
+    min_temps <- dplyr::rename(min_temp, min_temp=temp_in_c)
 
-# Combine all temp and sites ##################
+    alltemps <- dplyr::full_join(max_temps, min_temps) %>%
+        mutate(mean_temp = (max_temp + min_temp)/2) %>%
+        mutate(Date = timestart - 1 + Date) %>%
+        rename(Site=site)
 
-max_temps <- dplyr::rename(max_temp, max_temp=temp_in_c)
-min_temps <- dplyr::rename(min_temp, min_temp=temp_in_c)
+    return(alltemps)
+}
 
-alltemps <- dplyr::full_join(max_temps, min_temps) %>%
-    mutate(mean_temp = (max_temp + min_temp)/2) %>%
-    mutate(Date = timestart - 1 + Date) %>%
-    rename(Site=site)
+# extract data from PCIC downloads
+seed_orchard_temps <- extract_pcic(site_csv = "locations/seed_orchard_site_coordinates.csv",
+                                    maxtemp_nc = "data/pcic/PNWNAmet_tasmax.nc.nc",
+                                    mintemp_nc = "data/pcic/PNWNAmet_tasmin.nc.nc")
 
-#correct site names
-alltemps <- alltemps %>%
+northern_site_temps <- extract_pcic(site_csv = "locations/northern_site_coordinates.csv",
+                                    maxtemp_nc = "data/pcic/PNWNAmet_tasmax_north.nc.nc",
+                                    mintemp_nc = "data/pcic/PNWNAmet_tasmin_north.nc.nc")
+
+#add seed orchard site short names
+seed_orchard_temps <- seed_orchard_temps %>%
     mutate(Site = case_when(Site == "Sorrento Seed Orchard" ~ "Sorrento",
                              Site == "Kalamalka Seed Orchard" ~ "Kalamalka",
                              Site == "Vernon Seed Orchard Company" ~ "Vernon",
@@ -118,7 +131,7 @@ alltemps <- alltemps %>%
                              Site == "Kettle River Seed Orchards" ~ "KettleRiver",
                              Site == "Prince George Tree Improvement Station" ~ "PGTIS"))
 
-# Test #
+# Test ####
 
 #make sure no date at a site has more than one temperature associated with it
 toomanytest <- alltemps %>%
@@ -128,7 +141,10 @@ toomanytest <- alltemps %>%
     filter(tempsperdate > 1)
 nrow(toomanytest)==0 #TRUE
 
-write.csv(alltemps, '..data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
+# write ####
+
+write.csv(seed_orchard_temps, '..data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
+write.csv(northern_site_temps, 'data/pcic/northern_site_pcic_ts.csv', row.names = FALSE)
 
 # locations of both sites and the closest gridded weather point with corrected elevation ###########
 all_locations <- locations %>%
