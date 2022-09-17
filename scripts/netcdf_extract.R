@@ -151,27 +151,5 @@ nrow(toomanytest)==0 #TRUE
 
 # write ####
 
-write.csv(seed_orchard_temps, '..data/pcic/seed_orchard_sites_pcic_ts.csv', row.names = FALSE)
-write.csv(northern_site_temps, 'data/pcic/northern_site_pcic_ts.csv', row.names = FALSE)
-
-# locations of both sites and the closest gridded weather point with corrected elevation ###########
-all_locations <- locations %>%
-    select(-closest_lat_loc, -closest_lon_loc)
-
-colnames(all_locations) <- c("SeedOrchardSite", "Sitelat", "Sitelon", "Gridlat", "Gridlon")
-all_locations$shortname <- c("Sorrento", "Kalamalka", "Vernon", "PRT", "TOLKO", "Kettle River", "Prince George")
-
-# get elevation for sites and gridpoints ###########
-
-siteelevs <- rgbif::elevation(latitude= all_locations$Sitelat, longitude = all_locations$Sitelon, username="susannah2")
-colnames(siteelevs) <- c("Sitelat", "Sitelon", "Siteelev")
-all_locations <- full_join(siteelevs, all_locations)
-
-# get elevation for gridpoints
-gridelevs <- rgbif::elevation(latitude = all_locations$Gridlat, longitude=all_locations$Gridlon, username="susannah2")
-colnames(gridelevs) <- c("Gridlat", "Gridlon", "Gridelev")
-all_locations <- full_join(gridelevs, all_locations)
-
-# write
-write.csv(all_locations, '../locations/seed_orchard_sites_pcic.csv', row.names = FALSE)
-
+write.csv(all_temps, 'output/pcic/pcic_daily_temps.csv', row.names = FALSE)
+write.csv(grid_locs, 'locations/grid_coordinates.csv', row.names = FALSE)
