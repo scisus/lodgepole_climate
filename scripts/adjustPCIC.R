@@ -13,9 +13,9 @@ library(lubridate)
 #read in data ###########
 
 #pcic gridpoint
-pcicraw  <- read.csv("output/pcic/seed_orchard_sites_pcic_ts.csv")
+pcicraw  <- read.csv("output/pcic/pcic_daily_temps.csv")
 #climatena site and gridpoint
-cnaraw <- read.csv("output/climateNA/climatena_seedorchardsites_grid_1901-2018Mv6.20.csv")
+cbcraw <- read.csv("data/climateBC/monthly1901-2021v730.csv")
 
 # Data processing ###############
 
@@ -25,28 +25,27 @@ pcic <- pcicraw %>%
     mutate(Month = month(Date)) %>%
     rename(mean_temp_raw = mean_temp)
 
-cna <- cnaraw %>% select(id1, id2, Elevation, Year, starts_with("Tave")) %>%
+cbc <- cbcraw %>% select(Site, id, Elevation, Year, starts_with("Tave")) %>%
     gather(key="Month", value="mean_temp", starts_with("Tave")) %>%
-    mutate(Month = as.numeric(str_extract(Month, "\\d."))) %>%
-    rename(Site = id2)
+    mutate(Month = as.numeric(str_extract(Month, "\\d.")))
 
-cnasite <- filter(cna, id1=="site") %>%
+cbcsite <- filter(cbc, id=="site") %>%
     rename(meantempsite = mean_temp) %>%
-    select(-id1, -Elevation)
-cnagrid <- filter(cna, id1=="grid") %>%
+    select(-id, -Elevation)
+cbcgrid <- filter(cbc, id=="grid") %>%
     rename(meantempgrid = mean_temp) %>%
-    select(-id1, -Elevation)
-cna <- full_join(cnasite, cnagrid)
+    select(-id, -Elevation)
+cbc <- full_join(cbcsite, cbcgrid)
 
 # compare gridpoints and site locations in ClimateNA
 
-ggplot(filter(cna, Month < 7), aes(x=meantempgrid, y=meantempsite)) +
+ggplot(filter(cbc, Month < 7), aes(x=meantempgrid, y=meantempsite)) +
     geom_point() +
     facet_wrap("Site") +
     geom_abline(slope=1, intercept=0) +
-    ggtitle("ClimateNA mean monthly temps 1950-2013 gridpoints vs sitepoints", subtitle = "ClimateNA monthly estimates are quite similar for grid points and sitepoints")
+    ggtitle("ClimateBC mean monthly temps 1950-2013 gridpoints vs sitepoints", subtitle = "ClimateBC monthly estimates are quite similar for grid points and sitepoints")
 
-# now compare ClimateNA to PCIC data
+# now compare ClimateBC to PCIC data
 
 # calculate pcic monthly temperatures
 pcicmonthly <- pcic %>%
@@ -54,24 +53,24 @@ pcicmonthly <- pcic %>%
     group_by(Site, Year, Month) %>%
     summarise(meantempgridPCIC = mean(mean_temp_raw))
 
-cna_pcic <- left_join(pcicmonthly, cna)
+cbc_pcic <- left_join(pcicmonthly, cbc)
 
 # compare PCIC gridpoint temps to ClimateNA site temps
-ggplot(cna_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
+ggplot(cbc_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
     geom_point() +
     facet_wrap("Site") +
     geom_abline(slope=1, intercept=0) +
-    ggtitle("ClimateNA mean monthly temps at sites vs PCIC mean monthly temps")
+    ggtitle("ClimateBC mean monthly temps at sites vs PCIC mean monthly temps")
 
 #model monthly
-corrframemo <- cna_pcic %>%
+corrframemo <- cbc_pcic %>%
     split(.$Site) %>%
     map(~ lm(meantempsite ~ meantempgridPCIC, data = .)) %>% #model
     map_dfr("coefficients", .id = ".id") # extract slope and intercept
 colnames(corrframemo) <- c("Site", "intercept", "slope")
 
 #create table for paper
-# cna_pcic %>%
+# cbc_pcic %>%
 #     ungroup() %>%
 #     tidyr::nest(-Site) %>%
 #     dplyr::mutate(
@@ -101,7 +100,7 @@ ggplot(pciccorrmo, aes(x=mean_temp_raw, y=mean_temp_corrected)) +
     ggtitle("Raw mean temps vs corrected mean temps")
 
 # plot relationship with equations
-ggplot(cna_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
+ggplot(cbc_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
     geom_point(pch=1) +
     facet_wrap("Site") +
     geom_abline(slope=1, intercept=0) +
