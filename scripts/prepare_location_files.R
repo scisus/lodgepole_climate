@@ -10,7 +10,8 @@ library(rgbif)
 
 site_coord <- read.csv("locations/site_coordinates.csv", header = TRUE, stringsAsFactors = FALSE)
 
-siteelevs <- rgbif::elevation(latitude= site_coord$lat, longitude = site_coord$lon, username="susannah2")
+
+siteelevs <- rgbif::elevation(latitude= site_coord$lat, longitude = site_coord$lon, elevation_model = "srtm1", username="susannah2")
 colnames(siteelevs) <- c("lat", "lon", "el")
 site_coord_elev <- dplyr::full_join(site_coord, siteelevs)
 
@@ -21,7 +22,7 @@ write.csv(site_coord_elev, "locations/site_coord_elev.csv", row.names = FALSE)
 grid_coord <- read.csv("locations/grid_coordinates.csv", header = TRUE, stringsAsFactors = FALSE) %>%
     rename(lat = Grid_lat, lon = Grid_lon)
 
-gridelevs <- rgbif::elevation(latitude = grid_coord$lat, longitude=grid_coord$lon, username="susannah2")
+gridelevs <- rgbif::elevation(latitude = grid_coord$lat, longitude=grid_coord$lon, elevation_model = "gtopo30", username="susannah2")
 colnames(gridelevs) <- c("lat", "lon", "el")
 grid_coord_elev <- dplyr::full_join(gridelevs, grid_coord) %>%
     select(-contains("Site_"))

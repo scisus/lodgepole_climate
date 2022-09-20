@@ -1,12 +1,17 @@
 # meta for lodgepole_climate 
 
-`seed_orchard_site_coordinates.csv` locations and elevation of seed orchard sites alone, format acceptable for ClimateNA. Data collected by CS Tysor manually using Google Earth.
+Contains location information for 7 seed orchard sites and 2 more northerly sites used for phenology predictions. 
 
-`seed_orchard_sites_pcic.csv` location of seed orchard sites, the closest PCIC gridpoint, and a corrected elevation, calculated in `netcdf_extract.R`.
+Seed Orchard latitude and longitude data collected by CS Tysor manually using Google Earth, trench and border site lat and lon from ClimateBC. 
 
-`seed_orchard_sites_pcic_windows.csv` is the same as above, but with windows line endings so it works with ClimateNA.
+Elevation data for sites pulled from GeoNames via `rgbif::elevation` in R using [srtm1](https://doi.org/10.5066/F7PR7TFT) (USGS EROS Archive - Digital Elevation - Shuttle Radar Topography Mission (SRTM) Global). Sampled at a resolution of 2 arc-second by 1 arc-second (~60m x 30m).
 
-`seed_orchard_sites_pcic_cna.csv` locations and elevation of seed orchard sites and pcic grid points nearest seed orchard sites formatted for climateNA. Based on `seed_orchard_sites_pcic.csv`
+Elevation data for grid squares pulled from GeoNames via `rgbif::elevation` in R using [gtopo30](https://doi.org/10.5066/F7DF6PQS)(USGS EROS Archive - Digital Elevation - Global 30 Arc-Second Elevation (GTOPO30)). Sampled at a resolution of 30 arc seconds (~1 km)
 
+`climatebc_locs.csv` actual site locations + closest PNWNAmet gridpoint. lat, lon, elev. formatted for use with ClimateBC. Windows line endings.
 
+`grid_coordinates.csv` actual site locations + closest PNWNAmet gridpoints. lat, lon only
 
+`site_coord_elev.csv` actual site lat and lon with elevation
+
+`site_coordinates.csv` actual site lat and lon. 
