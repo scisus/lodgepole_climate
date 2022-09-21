@@ -110,5 +110,5 @@ ggplot(cbc_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
     theme_bw(base_size=15) +
     stat_smooth(method="lm")
 
-write.csv(pciccorrmo, "../lodgepole_climate/processed/PCIC_all_seed_orchard_sites_adjusted.csv", row.names=FALSE)
+write.csv(pciccorrmo, "processed/PNWNAmet_adjusted.csv", row.names=FALSE)
 

@@ -2,7 +2,7 @@
 
 # - extracts data from netcdf files with [maximum](data/pcic/PNWNAmet_tasmax_[location].nc.nc) and [minimum](data/pcic/PNWNAmet_tasmin_[location].nc.nc) temperatures for [seed orchard and 2 more northerly sites](location/site_coordinates.csv)
 # - calculates the mean daily temperature for each day of 1945-2012
-# - writes the mean daily temperature for each day out to a [file](output/pcic_daily_temps.csv)
+# - writes the mean daily temperature for each day out to a [file](output/PNWNWmet_daily_temps.csv)
 
 
 library(ncdf4)
@@ -151,5 +151,5 @@ nrow(toomanytest)==0 #TRUE
 
 # write ####
 
-write.csv(all_temps, 'output/pcic/pcic_daily_temps.csv', row.names = FALSE)
+write.csv(all_temps, 'output/pcic/PNWNAmet_daily_temps.csv', row.names = FALSE)
 write.csv(grid_locs, 'locations/grid_coordinates.csv', row.names = FALSE)
