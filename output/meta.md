@@ -1,6 +1,6 @@
 #meta for output
 
-## climateNA
+## climateNA [deprecated]
 
 Monthly weather data from [ClimateNA](http://climatena.ca/). 
 1901-2019 and 2011-2100 
