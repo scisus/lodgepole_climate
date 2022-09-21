@@ -5,5 +5,7 @@ run `lodgepole_climate/scripts/netcdf_extract.R` to create `output/pcic/PNWNAmet
 
 next run the climate adjuster `lodgepole_climate/scripts/adjustPCIC.R` to correct pcic grid data based on monthly mean temps from ClimateBC
 
+`prepare_location_files.R` creates some useful location files, including one for reading in to ClimateBC/ClimateNA
+
 This creates `processed/PNWNAmet_adjusted.csv` which contains corrected and uncorrected mean daily temperatures for all sites from 1945-2012.
 

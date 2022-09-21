@@ -13,7 +13,7 @@ library(lubridate)
 #read in data ###########
 
 #pcic gridpoint
-pcicraw  <- read.csv("output/pcic/pcic_daily_temps.csv")
+pcicraw  <- read.csv("output/pcic/PNWNAmet_daily_temps.csv")
 #climatena site and gridpoint
 cbcraw <- read.csv("data/climateBC/monthly1901-2021v730.csv")
 
