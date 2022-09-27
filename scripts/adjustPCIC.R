@@ -14,7 +14,7 @@ library(lubridate)
 
 #pcic gridpoint
 pcicraw  <- read.csv("output/pcic/PNWNAmet_daily_temps.csv")
-#climatena site and gridpoint
+#climatebc site and gridpoint
 cbcraw <- read.csv("data/climateBC/monthly1901-2021v730.csv")
 
 # Data processing ###############
@@ -37,7 +37,7 @@ cbcgrid <- filter(cbc, id=="grid") %>%
     select(-id, -Elevation)
 cbc <- full_join(cbcsite, cbcgrid)
 
-# compare gridpoints and site locations in ClimateNA
+# compare gridpoints and site locations in ClimateBC
 
 ggplot(filter(cbc, Month < 7), aes(x=meantempgrid, y=meantempsite)) +
     geom_point() +
@@ -55,7 +55,7 @@ pcicmonthly <- pcic %>%
 
 cbc_pcic <- left_join(pcicmonthly, cbc)
 
-# compare PCIC gridpoint temps to ClimateNA site temps
+# compare PCIC gridpoint temps to ClimateBC site temps
 ggplot(cbc_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
     geom_point() +
     facet_wrap("Site") +
@@ -106,7 +106,7 @@ ggplot(cbc_pcic, aes(x=meantempgridPCIC, y=meantempsite)) +
     geom_abline(slope=1, intercept=0) +
     ggtitle("Mean monthly temperatures 1997-2011") +
     xlab("PNWNAmet") +
-    ylab("ClimateNA") +
+    ylab("ClimateBC") +
     theme_bw(base_size=15) +
     stat_smooth(method="lm")
 
