@@ -22,7 +22,7 @@ write.csv(site_coord_elev, "locations/site_coord_elev.csv", row.names = FALSE)
 grid_coord <- read.csv("locations/grid_coordinates.csv", header = TRUE, stringsAsFactors = FALSE) %>%
     rename(lat = Grid_lat, lon = Grid_lon)
 
-gridelevs <- rgbif::elevation(latitude = grid_coord$lat, longitude=grid_coord$lon, elevation_model = "gtopo30", username="susannah2")
+gridelevs <- rgbif::elevation(latitude = grid_coord$lat, longitude=grid_coord$lon, elevation_model = "srtm3", username="susannah2")
 colnames(gridelevs) <- c("lat", "lon", "el")
 grid_coord_elev <- dplyr::full_join(gridelevs, grid_coord) %>%
     select(-contains("Site_"))
