@@ -10,7 +10,6 @@ library(rgbif)
 
 site_coord <- read.csv("locations/site_coordinates.csv", header = TRUE, stringsAsFactors = FALSE)
 
-
 siteelevs <- rgbif::elevation(latitude= site_coord$lat, longitude = site_coord$lon, elevation_model = "srtm1", username="susannah2")
 colnames(siteelevs) <- c("lat", "lon", "el")
 site_coord_elev <- dplyr::full_join(site_coord, siteelevs)
