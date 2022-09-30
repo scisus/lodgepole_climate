@@ -10,7 +10,13 @@ Elevation data for grid squares pulled from GeoNames via `rgbif::elevation` in R
 
 `climatebc_locs.csv` actual site locations + closest PNWNAmet gridpoint. lat, lon, elev. formatted for use with ClimateBC. Windows line endings.
 
+`climatebc_parent_locs.csv` latitude, longitude and elevations of parent tree locations formatted for use with ClimateBC. Windows line endings.
+
 `grid_coordinates.csv` actual site locations + closest PNWNAmet gridpoints. lat, lon only
+
+`parent_locs.csv` latitude, longitude and elevations of parent tree locations
+
+`ParentTreeExtractReport_ParentTrees_2014_05_15_13_38_17.csv` Parent tree info extracted from BC Ministry of Forests SPAR on 2014-05-15. 
 
 `site_coord_elev.csv` actual site lat and lon with elevation
 
