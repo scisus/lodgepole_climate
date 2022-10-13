@@ -1,3 +1,6 @@
+# This script creates
+## a typical daily temperature time series for each site and
+## a daily temperature time series for each climate normal period from 1921-2100 (and SSP for future time periods)
 # read in and combine monthly historical and future climate normal data
 # adjust daily data series to create timeseries for prediction
 
