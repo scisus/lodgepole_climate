@@ -39,8 +39,8 @@ normal_climate <- full_join(histnorm, futnorm) %>%
     select(-name)
 
 # add month and doy
-datetox <- data.frame(Scale = seq(lubridate::ymd('2024-01-01'), lubridate::ymd('2024-12-31'), by = "1 day")) %>%
-    mutate(DoY = lubridate::yday(Scale), month = lubridate::month(Scale))
+datetox <- data.frame(Date_scale = seq(lubridate::ymd('2024-01-01'), lubridate::ymd('2024-12-31'), by = "1 day")) %>%
+    mutate(DoY = lubridate::yday(Date_scale), month = lubridate::month(Scale))
 
 # generate a typical year ############
 
@@ -52,7 +52,7 @@ typical_ts <- pnwnamet %>%
     mutate(DoY = lubridate::yday(Date)) %>%
     group_by(Site, DoY) %>%
     summarise(mean_mean_temp = mean(mean_temp_corrected)) %>%
-    left_join(select(datetox, DoY, month))
+    left_join(datetox)
 
 write.csv(typical_ts, "processed/typical_ts.csv", row.names = FALSE)
 
