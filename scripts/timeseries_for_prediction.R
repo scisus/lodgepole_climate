@@ -52,7 +52,7 @@ typical_ts <- pnwnamet %>%
     mutate(DoY = lubridate::yday(Date)) %>%
     group_by(Site, DoY) %>%
     summarise(mean_mean_temp = mean(mean_temp_corrected)) %>%
-    left_join(datetox)
+    left_join(select(datetox, DoY, month))
 
 write.csv(typical_ts, "processed/typical_ts.csv", row.names = FALSE)
 
