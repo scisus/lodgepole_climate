@@ -40,7 +40,7 @@ normal_climate <- full_join(histnorm, futnorm) %>%
 
 # add month and doy
 datetox <- data.frame(Date_scale = seq(lubridate::ymd('2024-01-01'), lubridate::ymd('2024-12-31'), by = "1 day")) %>%
-    mutate(DoY = lubridate::yday(Date_scale), month = lubridate::month(Scale))
+    mutate(DoY = lubridate::yday(Date_scale), month = lubridate::month(Date_scale))
 
 # generate a typical year ############
 
