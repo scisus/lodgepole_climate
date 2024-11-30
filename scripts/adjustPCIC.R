@@ -45,6 +45,20 @@ ggplot(filter(cbc, Month < 7), aes(x=meantempgrid, y=meantempsite)) +
     geom_abline(slope=1, intercept=0) +
     ggtitle("ClimateBC mean monthly temps 1950-2013 gridpoints vs sitepoints", subtitle = "ClimateBC monthly estimates are quite similar for grid points and sitepoints")
 
+PNWNAmetClimateBCcomp <- cbc %>%
+    split(.$Site) %>%
+    map( ~ lm(meantempsite ~ meantempgrid, data = .)) %>%
+    map_dfr("coefficients", .id = ".id")
+
+PNWNAmetClimateBCcomp <- cbc %>%
+    split(.$Site) %>%
+    map( ~ {
+        model <- lm(meantempsite ~ meantempgrid, data = .)
+        data.frame(intercept = coef(model)[1], slope = coef(model)[2], r_squared = summary(model)$r.squared)
+    }) %>%
+    bind_rows(.id = ".id") %>%
+    arrange(slope, )
+
 # now compare ClimateBC to PCIC data
 
 # calculate pcic monthly temperatures
@@ -68,6 +82,7 @@ corrframemo <- cbc_pcic %>%
     map(~ lm(meantempsite ~ meantempgridPCIC, data = .)) %>% #model
     map_dfr("coefficients", .id = ".id") # extract slope and intercept
 colnames(corrframemo) <- c("Site", "intercept", "slope")
+saveRDS(corrframemo, '../flowering-cline/tables/corrframemo.rds')
 
 #create table for paper
 # cbc_pcic %>%
@@ -82,7 +97,7 @@ colnames(corrframemo) <- c("Site", "intercept", "slope")
 #     sprinkle(cols=c("estimate", "std.error", "statistic"), round = 2) %>%
 #     sprinkle(cols=c("p.value"), fn = quote(pvalString(value)))
 
-knitr::kable(corrframemo)
+knitr::kable(corrframemo, row.names = FALSE, digits = 2)
 
 # apply monthly corrections
 
